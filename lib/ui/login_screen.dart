@@ -1,12 +1,13 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_surf_test/ui/users_page.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin{
   String _login;
   bool _isLoginBtnEnabled = false;
 
@@ -34,7 +35,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 232, 233, 237),
+      resizeToAvoidBottomPadding: false, //TODO Сделать так чтобы плднималось вверх и пряталась надпись вход
+      backgroundColor: Colors.white,
       body: Stack (
         fit: StackFit.expand,
         children: <Widget>[
@@ -42,13 +44,12 @@ class _LoginScreenState extends State<LoginScreen> {
           fit: BoxFit.fitWidth,
           alignment: Alignment.topCenter,),
           Positioned(
-            bottom: 50,
+            top: 100,
+            bottom: 15,
             left: 30,
             right: 30,
-            top: 0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Container(
@@ -61,62 +62,72 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   margin: EdgeInsets.only(bottom: 40),
                 ),
-                Card(
-                  elevation: 16,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)
-                    ),
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 50, vertical: 60),
-                      height: 250,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            _buildTextField('Email', _emailController),
-                            _buildTextField('Пароль', _passwordController),
-                            MaterialButton(
-                              elevation: 0,
-                                minWidth: 230,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30)
-                              ),
-                              child: Text('Войти',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              color: Color.fromARGB(254, 155, 81, 224),
-                              disabledColor: Color.fromARGB(155, 155, 81, 224),
-                              onPressed: _isLoginBtnEnabled ? () => _callback() : null,
-                            )
-                          ],
-                        ),
-                    ),
-                  ),
-              ],
+                _buildCard(),
+                  ]
+              ),
             ),
-          )
-        ],
-      ),
-    );
+          ]
+        ),
+      );
   }
   
-  Widget _buildTextField(String text, TextEditingController controller) {
+  Widget _buildTextField(String text, TextEditingController controller, bool isHiden) {
     return TextFormField(
       controller: controller,
+      obscureText: isHiden,
       decoration: InputDecoration(
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6.0),
-              borderSide: BorderSide(color: Colors.red)
-          ),
-          hintText: text,
-          labelText: text
+          labelText: text,
       ),
     );
   }
 
   _callback() {
+    Navigator.pushReplacement(context, MaterialPageRoute(
+      builder: (context) => UsersPage(),
+    ));
+  }
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+
+    super.dispose();
+  }
+
+  _buildCard() {
+    return Card(
+      elevation: 16,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16)
+      ),
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 50, vertical: 60),
+        height: 250,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              _buildTextField('Email', _emailController, false),
+              _buildTextField('Пароль', _passwordController, true),
+              MaterialButton(
+                elevation: 0,
+                minWidth: 230,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)
+                ),
+                child: Text('Войти',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+                color: Color.fromARGB(254, 155, 81, 224),
+                disabledColor: Color.fromARGB(155, 155, 81, 224),
+                onPressed: _isLoginBtnEnabled ? () => _callback() : null,
+              ),
+            ]
+        ),
+      ),
+    );
   }
 }
